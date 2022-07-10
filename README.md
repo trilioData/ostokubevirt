@@ -42,10 +42,28 @@ This section defines the mapping between OpenStack instances flavor and image at
 | flavor:--property=hw:cpu_max_sockets |  | KubeVirt does not support this option |
 
 ### Mapping Instance Security Group Rules to Network Policy
-| Security Rule | Network Policy | Comments |
-| ------------- | -------------- | -------- |
-| --protocol tcp --dst-port 22:22 --remote-ip 0.0.0.0/0 |```yaml
+<table>
+<tr>
+<th>
+Security Rule
+</th>
+<th>
+Network Policy
+</th>
+<th>
+Comments
+</th>
+</tr>
+<tr>
 
+<td>
+<pre>
+--protocol tcp --dst-port 22:22 --remote-ip 0.0.0.0/0
+</pre>
+</td>
+
+<td>
+<pre>
 ---
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
@@ -63,4 +81,8 @@ spec:
       endPort: 22
   policyTypes:
   - Ingress
-```| |
+</pre>
+</td>
+
+</tr>
+</table>
