@@ -227,3 +227,83 @@ policyTypes:
          endPort: 53
 </pre></td><td/></tr>
 </table>
+
+### Mapping Floating IP addresses to Service resources
+
+<table>
+<tr>
+<th>
+Floating IP
+</th>
+<th>
+Service YAML
+</th>
+<th>
+Comments
+</th>
+</tr>
+  <tr><td>
+    Floating IP of OpenStack Instance MyApp
+    </td>
+    <td>
+      <pre>
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: my-service
+spec:
+  selector:
+    app: MyApp
+  ports:
+    - protocol: TCP
+ </pre>
+    </td><td/></tr>
+
+  </table>
+  
+### OpenStack Domains and Tenants to Namespaces
+
+With domains, OpenStack supports the grouping of tenants. Kubernetes do not have a hierarchy of namespaces. We may choose to translate a domain_tenant to a Kubernetes namespace. All virtual machines in a single-tenant will be migrated to a namespace identified by “domain_tenant”
+
+### OpenStack Users and Groups and Kubernetes Users and Groups
+
+This may be a straightforward mapping between OpenStack and Kubernetes.
+
+## Migration Tool Implementation
+
+The migration tool is implemented as a python based script and is hosted on a Linux host that has access to both OpenStack cloud and Kubernetes running KubeVirt. For simplicity, we refer to KubeVirt as a Kubernetes running KubeVirt. The goal is to migrate VMs running on the OpenStack cloud to KubeVirt. We assume KubeVirt is running Calico for pod networking. We also assume that KubeVirt has enough compute and memory resources to accommodate all the virtual machines from OpenStack. We also assume that an NFS target is configured as backup storage for the OpenStack cloud and the same NFS share is accessible to KubeVirt to access the qcow2 images.
+
+### Pseudo Code
+
+```
+Create namespaces in Kubernetes for every domain_tenant
+
+Create users and groups that correspond to users and user groups in OpenStack
+
+for each domain in the openstack
+
+     for each tenant in the domain
+
+           for each security group in the tenant
+
+                  create network policy that encompasses security group and rules
+
+           for each vm in the tenant
+
+                  define a vmi spec based on openstack flavor and images                  
+                  define devices mapping based on the block device mappings of the openstack 
+                  assign a security group label that assigns all the security groups assigned to the openstack vm
+
+                  take a full backup of VM by invoking TVO functionality
+
+                  Create data volumes from the qcow2 images invoking kubevirt CDI functionality. Use custom disk image path feature to reference the qcow2 image on the NFS share
+
+                  Create virtual machine on kubevirt.
+        
+```
+## Conclusion
+Even though this document describes how an OpenStack can be migrated to KubeVirt, the actual implementation may involve much more fine-tuning. We are confident that we can successfully migrate the OpenStack cloud to a KubeVirt with minimum loss of functionality to workloads.
+
+## References
+https://kubevirt.io/user-guide/virtual_machines/disks_and_volumes/#custom-disk-image-path
