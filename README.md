@@ -273,7 +273,7 @@ This may be a straightforward mapping between OpenStack and Kubernetes.
 ## Migration Tool Implementation
 
 The migration tool is implemented as a python based script and is hosted on a Linux host that has access to both OpenStack cloud and Kubernetes running KubeVirt. For simplicity, we refer to KubeVirt as a Kubernetes running KubeVirt. The goal is to migrate VMs running on the OpenStack cloud to KubeVirt. We assume KubeVirt is running Calico for pod networking. We also assume that KubeVirt has enough compute and memory resources to accommodate all the virtual machines from OpenStack. We also assume that an NFS target is configured as backup storage for the OpenStack cloud and the same NFS share is accessible to KubeVirt to access the qcow2 images.
-
+<img src="images/ostokubevirt.png" width="40%" height="40%">
 ### Pseudo Code
 
 ```
