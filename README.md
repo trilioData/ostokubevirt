@@ -40,3 +40,28 @@ This section defines the mapping between OpenStack instances flavor and image at
 | flavor:--property hw:cpu_threads | spec.domain.cpu.dedicatedplacement | |
 | spec.domain.cpu.numa.guestMappingPassthrough | spec.domain.cpu.threads | |
 | flavor:--property=hw:cpu_max_sockets |  | KubeVirt does not support this option |
+
+### Mapping Instance Security Group Rules to Network Policy
+| Security Rule | Network Policy | Comments |
+| ------------- | -------------- | -------- |
+| --protocol tcp --dst-port 22:22 --remote-ip 0.0.0.0/0 |
+```yaml
+
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-all-ingress
+spec:
+  podSelector: {}
+  ingress:
+  - from:
+    - ipBlock:
+        cidr: 0.0.0.0/24
+    ports:
+    - protocol: TCP
+      port: 22
+      endPort: 22
+  policyTypes:
+  - Ingress
+```
