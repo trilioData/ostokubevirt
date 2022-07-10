@@ -83,6 +83,147 @@ spec:
   - Ingress
 </pre>
 </td>
-
+<td/>
 </tr>
+<tr>
+<td>
+Allows SSH traffic from any IP to the instance
+<pre>
+--protocol tcp --dst-port 22:22 --remote-group SOURCE_GROUP_NAME
+</pre>
+We assign the security group name as label to the VM and we will use pod selector to allow traffic from the VMs that has the security group name as label
+</td>
+<td>
+<pre>
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+   name: test-network-policy
+namespace: default
+spec:
+   podSelector:
+      matchLabels:
+        security_group: SECURITY_GROUP_NAME
+
+   policyTypes:
+          - Ingress
+   ingress:
+     - from:
+        ports:
+           - protocol: TCP
+             port: 22
+             endPort: 22
+</pre>
+</td>
+<td>  
+When a VM is created, it is assigned a label security_group: SECURITY_GROUP_NAME.
+
+This label is later used to allow network traffic only from those specified VMs which can be used to implement remote security group based rules.
+</td>
+</tr>
+<tr>
+<td>
+<pre>
+  --protocol icmp
+</pre>
+  </td>
+  <td>
+    <pre>
+---
+apiVersion: projectcalico.org/v3
+kind: GlobalNetworkPolicy
+metadata:
+name: allow-ping-in-cluster
+spec:
+selector: all()
+types:
+
+Ingress
+ingress:
+
+action: Allow
+protocol: ICMP
+source:
+selector: all()
+icmp:
+type: 8 # Ping request
+
+action: Allow
+protocol: ICMPv6
+source:
+selector: all()
+icmp:
+type: 128 # Ping request
+</pre></td><td>
+Allow ping from any host. Basic k8s network policy does not support ICMP based protocol. Calico supports ICMP based network policy
+  </td></tr><tr><td><pre>
+  --protocol icmp \
+  --remote-group SOURCE_GROUP_NAME
+  </pre><td><pre>
+---
+apiVersion: projectcalico.org/v3
+kind: GlobalNetworkPolicy
+metadata:
+name: allow-host-unreachable
+spec:
+selector: security_group=SOURCE_GROUP_NAME
+types:
+
+Ingress
+ingress:
+
+action: Allow
+protocol: ICMP
+icmp:
+type: 3 # Destination unreachable
+code: 1 # Host unreachable
+</pre></td><td>
+Allow ping from only from the remote group, which includes set of ports that the remote group is assigned to
+</td></tr>
+  <tr><td><pre>
+    --protocol udp 
+  --dst-port 53:53
+  </pre></td><td>
+    <pre>
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-all-ingress
+spec:
+  podSelector: {}
+  ingress:
+  - from:
+    - ipBlock:
+        cidr: 0.0.0.0/24
+    ports:
+    - protocol: UDP
+      port: 53
+      endPort: 53
+  policyTypes:
+  - Ingress
+  </pre></td><td/></tr><tr><td><pre>
+  --protocol udp \
+  --dst-port 53:53 --remote-group SOURCE_GROUP_NAME SECURITY_GROUP
+  </pre></td><td><pre>
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+   name: test-network-policy
+   namespace: default
+spec:
+   podSelector:
+      matchLabels:
+         security_group: SECURITY_GROUP_NAME
+policyTypes:
+   - Ingress
+   ingress:
+   - from:
+   ports:
+       - protocol: UDP
+         port: 53
+         endPort: 53
+</pre></td><td/></tr>
 </table>
