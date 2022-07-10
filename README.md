@@ -10,5 +10,5 @@ This document discusses the migration procedure from OpenStack to KubeVirt. We f
 ## Mapping OpenStack Concepts to Kubernetes
 This section defines the mapping between OpenStack concepts such as instances, flavors, images, security groups, cinder volumes, floating IP addresses, domains, tenants and roles to Kubernetes constructs
 
-## Mapping from OpenStack instances to KubeVirt VM Spec
+### Mapping from OpenStack instances to KubeVirt VM Spec
 This section defines the mapping between OpenStack instances flavor and image attributes to KubeVirt VirtualMachine specifications.
