@@ -12,3 +12,31 @@ This section defines the mapping between OpenStack concepts such as instances, f
 
 ### Mapping from OpenStack instances to KubeVirt VM Spec
 This section defines the mapping between OpenStack instances flavor and image attributes to KubeVirt VirtualMachine specifications.
+| OpenStack Instance Attribute | KubeVirt Spec Path | Comments |
+| ---------------------------- | ------------------ | -------- |
+| image:--property hw_cpu_sockets | spec.domain.cpu.dedicatedplacement | |
+| spec.domain.cpu.numa.guestMappingPassthrough | spec.domain.cpu.sockets |
+| image:--property hw_cpu_cores | spec.domain.cpu.dedicatedplacement | |
+| spec.domain.cpu.numa.guestMappingPassthrough | spec.domain.cpu.cores |
+| image:--property hw_cpu_max_sockets | spec.domain.cpu.dedicatedplacement | |
+| spec.domain.cpu.numa.guestMappingPassthrough | spec.domain.cpu.cores | |
+| image:--property hw_cpu_max_threads | spec.domain.cpu.dedicatedplacement | |
+| spec.domain.cpu.numa.guestMappingPassthrough | spec.domain.cpu.threads | |
+| flavor:vcpus | spec.domain.cpu.cores or spec.domain.requests.resources.cpu | |
+| flavor:Swap | KubeVirt does not support | |
+| flavor:root disk GB | spec.domain.devices.disks.containerdisk | |
+| spec.volumes.containerdisk.image | flavor:memory | |
+| spec.domain.requests.resources.memory | flavor:Extra Specs | Extra specs determine the scheduling policy where the instance can be scheduled. On k8s, they can translate into node selector in the VM spec |
+| flavor:Ephemeral Disk GB | spec.domain.devices.disks.emptydisk | |
+| spec.volumes.emptydisk.image | flavor:--property hw:numa_mem.1 |  KubeVirt does not support this option |
+| flavor:--property hw:numa_nodes | | KubeVirt does not support this option |
+| flavor:--property hw:numa_cpus.0 | | KubeVirt does not support this option |
+| flavor:--property hw:cpu_policy | | KubeVirt does not support this option |
+| flavor:--property hw:cpu_thread_policy | | KubeVirt does not support this option |
+| flavor:--property hw:cpu_sockets | spec.domain.cpu.dedicatedplacement | |
+| spec.domain.cpu.numa.guestMappingPassthrough | spec.domain.cpu.sockets | |
+| flavor:--property hw:cpu_cores | spec.domain.cpu.dedicatedplacement | |
+| spec.domain.cpu.numa.guestMappingPassthrough | spec.domain.cpu.cores | |
+| flavor:--property hw:cpu_threads | spec.domain.cpu.dedicatedplacement | |
+| spec.domain.cpu.numa.guestMappingPassthrough | spec.domain.cpu.threads | |
+| flavor:--property=hw:cpu_max_sockets |  | KubeVirt does not support this option |
