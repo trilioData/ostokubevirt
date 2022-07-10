@@ -44,8 +44,7 @@ This section defines the mapping between OpenStack instances flavor and image at
 ### Mapping Instance Security Group Rules to Network Policy
 | Security Rule | Network Policy | Comments |
 | ------------- | -------------- | -------- |
-| --protocol tcp --dst-port 22:22 --remote-ip 0.0.0.0/0 |
-```yaml
+| --protocol tcp --dst-port 22:22 --remote-ip 0.0.0.0/0 |```yaml
 
 ---
 apiVersion: networking.k8s.io/v1
@@ -64,5 +63,4 @@ spec:
       endPort: 22
   policyTypes:
   - Ingress
-```
-| |
+```| |
